@@ -1,7 +1,1 @@
-{
-  "functions": {
-    "api/search.js": {
-      "runtime": "@vercel/node@5.0.0"
-    }
-  }
-}
+{}
