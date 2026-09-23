@@ -55,9 +55,11 @@ module.exports = async (req, res) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          scrapeMode: 'overview',
+          searchMode: 'byQuery',
           queries: [query],
-          maxResults: 100,
-          maxPages: 3,
+          maxResults: 25,
+          maxPages: 1,
         }),
       }
     );
