@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/search.js": {
+      "runtime": "nodejs24.x",
+      "includeFiles": "node_modules/node-libcurl-ja3/**"
+    }
+  }
+}
