@@ -382,7 +382,8 @@ function showHelpButtons() {
 
 async function askAI(question) {
   addUserMessage(question);
-  const bubble = addAIMessage('<div class="typing">Думаю<span class="typing-dots"><span></span><span></span><span></span></span></div>');
+  const bubble = addAIMessage('');
+  bubble.innerHTML = '<div class="typing">Думаю<span class="typing-dots"><span></span><span></span><span></span></span></div>';
 
   try {
     const res = await fetch(`${AI_URL}?prompt=${encodeURIComponent(question)}`);
