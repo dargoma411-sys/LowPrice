@@ -43,7 +43,6 @@
     flex-direction: column;
   }
 
-  /* Вкладки */
   .tabs {
     display: flex;
     gap: 4px;
@@ -81,7 +80,6 @@
   .tab-content { display: none; flex: 1; flex-direction: column; }
   .tab-content.active { display: flex; }
 
-  /* Шапка */
   .brand-row {
     display: flex;
     align-items: center;
@@ -117,7 +115,6 @@
     background-clip: text;
   }
 
-  /* Чат */
   .chat {
     flex: 1;
     display: flex;
@@ -179,7 +176,6 @@
     color: var(--text);
   }
 
-  /* Индикатор действий ИИ */
   .typing {
     display: flex;
     align-items: center;
@@ -226,15 +222,8 @@
     transition: all 0.3s;
   }
 
-  .step-item.active {
-    opacity: 1;
-    color: var(--text);
-  }
-
-  .step-item.done {
-    opacity: 0.9;
-    color: var(--yellow);
-  }
+  .step-item.active { opacity: 1; color: var(--text); }
+  .step-item.done { opacity: 0.9; color: var(--yellow); }
 
   .step-item .step-icon {
     width: 16px;
@@ -245,12 +234,8 @@
     justify-content: center;
   }
 
-  .step-item .step-icon svg {
-    width: 14px;
-    height: 14px;
-  }
+  .step-item .step-icon svg { width: 14px; height: 14px; }
 
-  /* Поле ввода */
   .input-area {
     position: sticky;
     bottom: 0;
@@ -259,7 +244,14 @@
     margin-top: auto;
   }
 
+  .input-row {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+  }
+
   .search-box {
+    flex: 1;
     display: flex;
     gap: 10px;
     background: rgba(20,20,20,0.85);
@@ -313,7 +305,24 @@
 
   .search-box button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  /* Фильтры */
+  .clear-btn {
+    padding: 0 18px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    background: rgba(20,20,20,0.85);
+    color: var(--text-dim);
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .clear-btn:hover {
+    color: var(--text);
+    border-color: rgba(255,140,66,0.35);
+  }
+
   .filters {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -368,11 +377,31 @@
     font-weight: 500;
   }
 
-  .filter-opt input {
+  .custom-price {
     display: none;
+    margin-top: 10px;
+    gap: 6px;
   }
 
-  /* Карточки товаров */
+  .custom-price.show { display: block; }
+
+  .custom-price input {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(10,10,10,0.6);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.82rem;
+    outline: none;
+    margin-bottom: 6px;
+  }
+
+  .custom-price input:focus {
+    border-color: var(--border-hover);
+  }
+
   .products {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -462,7 +491,6 @@
 
   .card-link svg { width: 13px; height: 13px; }
 
-  /* Пусто */
   .empty {
     grid-column: 1 / -1;
     text-align: center;
@@ -471,7 +499,6 @@
     font-size: 0.9rem;
   }
 
-  /* Футер */
   .footer {
     border-top: 1px solid rgba(255,255,255,0.06);
     padding: 18px 24px;
@@ -488,7 +515,6 @@
     background-clip: text;
   }
 
-  /* О сайте */
   .about-content {
     max-width: 640px;
     margin: 0 auto;
@@ -576,6 +602,7 @@
     .filters { grid-template-columns: 1fr; }
     .search-box { padding: 6px 6px 6px 14px; }
     .search-box button { padding: 0 18px; font-size: 0.85rem; }
+    .clear-btn { padding: 0 12px; font-size: 0.8rem; }
   }
 </style>
 </head>
@@ -588,7 +615,6 @@
     <button class="tab" data-tab="about">О сайте</button>
   </div>
 
-  <!-- Поиск -->
   <div class="tab-content active" id="tab-search">
 
     <div class="brand-row">
@@ -614,28 +640,30 @@
             <button class="filter-opt" data-value="desc">От дорогого к дешёвому</button>
             <button class="filter-opt" data-value="custom">Свой выбор</button>
           </div>
-          <div id="customPrice" style="display:none; margin-top:10px; display:none; gap:6px;">
-            <input type="number" id="minPrice" placeholder="от ₽" style="width:100%; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(10,10,10,0.6); color:var(--text); font-family:inherit; font-size:0.82rem; outline:none; margin-bottom:6px;">
-            <input type="number" id="maxPrice" placeholder="до ₽" style="width:100%; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(10,10,10,0.6); color:var(--text); font-family:inherit; font-size:0.82rem; outline:none;">
+          <div class="custom-price" id="customPrice">
+            <input type="number" id="minPrice" placeholder="от ₽">
+            <input type="number" id="maxPrice" placeholder="до ₽">
           </div>
         </div>
       </div>
 
-      <div class="search-box">
-        <input type="text" id="query" placeholder="Напиши название товара, который хочешь купить выгоднее всего...">
-        <button id="searchBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-            <polyline points="12 5 19 12 12 19"></polyline>
-          </svg>
-          Найти
-        </button>
+      <div class="input-row">
+        <div class="search-box">
+          <input type="text" id="query" placeholder="Напиши название товара или спроси, что я умею...">
+          <button id="searchBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+            Найти
+          </button>
+        </div>
+        <button class="clear-btn" id="clearBtn">Очистить</button>
       </div>
     </div>
 
   </div>
 
-  <!-- О сайте -->
   <div class="tab-content" id="tab-about">
     <div class="about-content">
       <h2>О Low Price</h2>
@@ -682,13 +710,36 @@
 const API_URL = '/api/search';
 let currentProducts = [];
 let chatInitialized = false;
+let filterState = { rating: 'any', price: 'asc' };
 
 const starSvg = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
 const arrowSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
 const checkSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-const spinnerSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2a10 10 0 0 1 10 10" /></svg>';
+const spinnerSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="animation: spin 1s linear infinite; transform-origin: center;"><path d="M12 2a10 10 0 0 1 10 10" /></svg>';
 
 const PLACEHOLDER_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300"><rect width="300" height="300" fill="#1a1a1a"/><text x="150" y="155" font-family="sans-serif" font-size="14" fill="#666" text-anchor="middle">Нет фото</text></svg>');
+
+/* Слова-паразиты, которые убираем из запроса */
+const STOP_WORDS = ['хочу', 'хотел', 'хотела', 'купить', 'куплю', 'найти', 'найди', 'ищу', 'поищи', 'можно', 'где', 'мне', 'бы', 'надо', 'нужно', 'пожалуйста', 'плиз', 'привет', 'здравствуй', 'помоги', 'помогите', 'подскажи', 'подскажите', 'дай', 'дайте', 'есть', 'ли', 'у', 'меня'];
+
+/* Фразы, на которые бот отвечает помощью, а не ищет */
+const HELP_PHRASES = ['как', 'что ты умеешь', 'помощь', 'help', 'ты кто', 'как работает', 'что делать', 'что можешь'];
+
+function cleanQuery(raw) {
+  let query = raw.toLowerCase();
+  // Убираем слова-паразиты как отдельные слова
+  STOP_WORDS.forEach(word => {
+    query = query.replace(new RegExp(`(^|\\s)${word}(\\s|$)`, 'gi'), ' ');
+  });
+  // Убираем лишние пробелы и знаки
+  query = query.replace(/[?!.,]+/g, ' ').replace(/\s+/g, ' ').trim();
+  return query;
+}
+
+function isHelpRequest(text) {
+  const lower = text.toLowerCase();
+  return HELP_PHRASES.some(phrase => lower.includes(phrase));
+}
 
 function escapeHtml(str) {
   return String(str || '')
@@ -711,7 +762,6 @@ document.querySelectorAll('.tab').forEach(tab => {
 
 /* Чат */
 const chat = document.getElementById('chat');
-const inputArea = document.querySelector('.input-area');
 const filters = document.getElementById('filters');
 
 function addAIMessage(html) {
@@ -735,12 +785,11 @@ function scrollChat() {
   window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 }
 
-/* Инициализация чата */
 function initChat() {
   if (chatInitialized) return;
   chatInitialized = true;
 
-  addAIMessage('Привет! Напиши название товара, который хочешь купить выгоднее всего.');
+  addAIMessage('Привет! Я помогу найти выгодные предложения на цифровые товары: игры, подписки, ключи, аккаунты. Напиши название — например, «Steam Balance» или «PlayStation Plus». Если что-то непонятно — спроси, я подскажу.');
 
   setTimeout(() => {
     filters.style.display = 'grid';
@@ -750,8 +799,6 @@ function initChat() {
 initChat();
 
 /* Фильтры */
-let filterState = { rating: 'any', price: 'asc' };
-
 document.querySelectorAll('.filter-options').forEach(group => {
   const groupName = group.dataset.group;
   group.querySelectorAll('.filter-opt').forEach(btn => {
@@ -762,7 +809,11 @@ document.querySelectorAll('.filter-options').forEach(group => {
 
       if (groupName === 'price') {
         const custom = document.getElementById('customPrice');
-        custom.style.display = btn.dataset.value === 'custom' ? 'block' : 'none';
+        if (btn.dataset.value === 'custom') {
+          custom.classList.add('show');
+        } else {
+          custom.classList.remove('show');
+        }
       }
 
       if (currentProducts.length > 0) renderProducts();
@@ -773,7 +824,26 @@ document.querySelectorAll('.filter-options').forEach(group => {
 document.getElementById('minPrice').addEventListener('input', () => { if (currentProducts.length > 0) renderProducts(); });
 document.getElementById('maxPrice').addEventListener('input', () => { if (currentProducts.length > 0) renderProducts(); });
 
-/* Шаги поиска */
+/* Кнопка очистки */
+document.getElementById('clearBtn').addEventListener('click', () => {
+  chat.innerHTML = '';
+  currentProducts = [];
+  chatInitialized = false;
+  filterState = { rating: 'any', price: 'asc' };
+  filters.style.display = 'none';
+
+  // Сброс активных кнопок фильтров
+  document.querySelectorAll('.filter-options').forEach(group => {
+    group.querySelectorAll('.filter-opt').forEach((b, i) => {
+      b.classList.toggle('active', i === 0);
+    });
+  });
+  document.getElementById('customPrice').classList.remove('show');
+
+  initChat();
+});
+
+/* Шаги */
 function createStepsBubble() {
   const bubble = addAIMessage('');
   bubble.innerHTML = `
@@ -805,13 +875,28 @@ function markStepActive(bubble, stepName) {
 }
 
 async function search() {
-  const query = document.getElementById('query').value.trim();
-  if (query.length < 3) {
-    addAIMessage('Запрос должен быть минимум 3 символа. Попробуй ещё раз.');
+  const raw = document.getElementById('query').value.trim();
+  if (!raw) return;
+
+  // Проверка: это вопрос о помощи или поиск товара?
+  if (isHelpRequest(raw)) {
+    addUserMessage(raw);
+    document.getElementById('query').value = '';
+    addAIMessage('Я помогаю искать выгодные предложения на цифровые товары: игры, подписки, ключи активации, аккаунты. Просто напиши название, и я найду цены. Например: «Steam Balance», «PlayStation Plus», «Discord Nitro». Сортировка по цене и рейтингу продавца — настраивается кнопками внизу.');
     return;
   }
 
-  addUserMessage(query);
+  // Очищаем запрос от мусорных слов
+  const query = cleanQuery(raw);
+
+  if (query.length < 3) {
+    addUserMessage(raw);
+    document.getElementById('query').value = '';
+    addAIMessage('Не могу разобрать запрос. Напиши название товара, например «Steam Balance» или «PlayStation Plus».');
+    return;
+  }
+
+  addUserMessage(raw);
   document.getElementById('query').value = '';
 
   const btn = document.getElementById('searchBtn');
@@ -819,7 +904,6 @@ async function search() {
 
   const bubble = createStepsBubble();
 
-  // Анимация шагов
   const steps = ['products', 'images', 'seller', 'rating'];
   let currentStepIndex = 0;
   markStepActive(bubble, steps[0]);
@@ -841,6 +925,10 @@ async function search() {
     clearInterval(stepTimer);
     steps.forEach(s => markStepDone(bubble, s));
 
+    // Скрываем «Ищу ●●●»
+    const typing = bubble.querySelector('.typing');
+    if (typing) typing.style.display = 'none';
+
     if (data.error) {
       addAIMessage('Ошибка: ' + escapeHtml(data.error));
       return;
@@ -849,7 +937,7 @@ async function search() {
     currentProducts = data.products || [];
 
     if (currentProducts.length === 0) {
-      addAIMessage(`По запросу «${escapeHtml(query)}» ничего не найдено. Попробуй другое название.`);
+      addAIMessage(`По запросу «${escapeHtml(query)}» ничего не найдено. Попробуй другое название или переформулируй.`);
       return;
     }
 
@@ -863,6 +951,8 @@ async function search() {
     renderProducts();
   } catch (e) {
     clearInterval(stepTimer);
+    const typing = bubble.querySelector('.typing');
+    if (typing) typing.style.display = 'none';
     addAIMessage('Ошибка сети: ' + escapeHtml(e.message));
   } finally {
     btn.disabled = false;
@@ -875,12 +965,10 @@ function renderProducts() {
 
   let filtered = [...currentProducts];
 
-  // Рейтинг
   if (filterState.rating === 'high') {
     filtered = filtered.filter(p => p.rating >= 4);
   }
 
-  // Цена
   if (filterState.price === 'asc') {
     filtered.sort((a, b) => a.price - b.price);
   } else if (filterState.price === 'desc') {
@@ -913,6 +1001,11 @@ function renderProducts() {
 
 document.getElementById('searchBtn').addEventListener('click', search);
 document.getElementById('query').addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
+
+/* Анимация спиннера для SVG */
+const styleEl = document.createElement('style');
+styleEl.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+document.head.appendChild(styleEl);
 </script>
 
 </body>
