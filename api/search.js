@@ -1,6 +1,10 @@
 const APIFY_TOKEN = process.env.APIFY_TOKEN;
 const ACTOR_ID = 'sian.agency~wildberries-product-scraper';
 
+const PLACEHOLDER = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" fill="#1a1a1a"/><text x="150" y="155" font-family="sans-serif" font-size="16" fill="#666" text-anchor="middle">Нет фото</text></svg>'
+);
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -19,8 +23,8 @@ module.exports = async (req, res) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           queries: [query],
-          maxResults: 50,
-          maxPages: 1,
+          maxResults: 100,
+          maxPages: 3,
         }),
       }
     );
@@ -42,8 +46,12 @@ module.exports = async (req, res) => {
       let img = p.thumbnail || null;
 
       if (!img && Array.isArray(p.images) && p.images.length > 0) {
-        img = p.images[0];
+        const first = p.images[0];
+        img = typeof first === 'string' ? first : (first?.url || first?.big || first?.c516x688 || null);
       }
+
+      if (!img && p.image) img = p.image;
+      if (!img && p.imageUrl) img = p.imageUrl;
 
       return {
         id: p.id || p.nmId,
@@ -53,7 +61,7 @@ module.exports = async (req, res) => {
         oldPrice: p.price_original || null,
         rating: p.rating || 0,
         feedbacks: p.feedbacks || 0,
-        image: img,
+        image: img || PLACEHOLDER,
         url: p.url || p.productUrl || `https://www.wildberries.ru/catalog/${p.id}/detail.aspx`,
       };
     });
