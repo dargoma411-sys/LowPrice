@@ -38,17 +38,25 @@ module.exports = async (req, res) => {
       return res.json({ products: [] });
     }
 
-    const products = items.map(p => ({
-      id: p.nmId || p.id,
-      name: p.name || '',
-      brand: p.brand || '',
-      price: p.salePrice || p.price || 0,
-      oldPrice: p.price_original || null,
-      rating: p.rating || 0,
-      feedbacks: p.feedbacks || 0,
-      image: p.image || p.imageUrl || null,
-      url: p.url || p.productUrl || `https://www.wildberries.ru/catalog/${p.nmId}/detail.aspx`,
-    }));
+    const products = items.map(p => {
+      let img = p.thumbnail || null;
+
+      if (!img && Array.isArray(p.images) && p.images.length > 0) {
+        img = p.images[0];
+      }
+
+      return {
+        id: p.id || p.nmId,
+        name: p.productTitle || p.name || '',
+        brand: p.brand || '',
+        price: p.price || p.salePrice || 0,
+        oldPrice: p.price_original || null,
+        rating: p.rating || 0,
+        feedbacks: p.feedbacks || 0,
+        image: img,
+        url: p.url || p.productUrl || `https://www.wildberries.ru/catalog/${p.id}/detail.aspx`,
+      };
+    });
 
     res.json({ products });
   } catch (e) {
