@@ -7,596 +7,100 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ff6a00'/%3E%3Cstop offset='100%25' stop-color='%23ffc93c'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Ctext x='32' y='45' font-family='Arial,sans-serif' font-size='40' font-weight='800' fill='%230a0a0a' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   :root {
-    --black: #0a0a0a;
-    --orange: #ff6a00;
-    --orange-soft: #ff8c42;
-    --yellow: #ffc93c;
-    --yellow-soft: #ffe08a;
-    --text: #f5f5f5;
-    --text-dim: rgba(245,245,245,0.55);
-    --border: rgba(255,140,66,0.18);
-    --border-hover: rgba(255,140,66,0.55);
+    --black: #0a0a0a; --orange: #ff6a00; --orange-soft: #ff8c42;
+    --yellow: #ffc93c; --yellow-soft: #ffe08a;
+    --text: #f5f5f5; --text-dim: rgba(245,245,245,0.55);
+    --border: rgba(255,140,66,0.18); --border-hover: rgba(255,140,66,0.55);
   }
-
   body {
     font-family: 'Inter', -apple-system, 'Segoe UI', system-ui, sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background:
-      radial-gradient(ellipse at 20% 0%, rgba(255,106,0,0.18), transparent 55%),
+    min-height: 100vh; display: flex; flex-direction: column;
+    background: radial-gradient(ellipse at 20% 0%, rgba(255,106,0,0.18), transparent 55%),
       radial-gradient(ellipse at 85% 15%, rgba(255,201,60,0.12), transparent 50%),
       linear-gradient(160deg, #0a0a0a 0%, #15100a 45%, #0a0a0a 100%);
-    color: var(--text);
-    -webkit-font-smoothing: antialiased;
+    color: var(--text); -webkit-font-smoothing: antialiased;
   }
-
-  .page {
-    flex: 1;
-    padding: 24px;
-    max-width: 900px;
-    margin: 0 auto;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .tabs {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 24px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-  }
-
-  .tab {
-    padding: 14px 22px;
-    background: transparent;
-    border: none;
-    color: var(--text-dim);
-    font-family: inherit;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    position: relative;
-    transition: color 0.2s;
-  }
-
-  .tab:hover { color: var(--text); }
-  .tab.active { color: var(--yellow); }
-
-  .tab.active::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--orange), var(--yellow));
-    border-radius: 2px;
-  }
-
-  .tab-content { display: none; flex: 1; flex-direction: column; }
-  .tab-content.active { display: flex; }
-
-  .brand-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-
-  .brand-mark {
-    width: 42px;
-    height: 42px;
-    border-radius: 13px;
-    background: linear-gradient(135deg, var(--orange) 0%, var(--yellow) 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 6px 20px rgba(255,106,0,0.3);
-    flex-shrink: 0;
-  }
-
-  .brand-mark span {
-    font-size: 1.3rem;
-    font-weight: 800;
-    color: #0a0a0a;
-  }
-
-  .brand-row h1 {
-    font-size: 1.25rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    background: linear-gradient(90deg, #ffffff 0%, var(--yellow-soft) 60%, var(--orange) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .chat {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    padding-bottom: 20px;
-  }
-
-  .msg {
-    display: flex;
-    gap: 10px;
-    animation: msgIn 0.35s cubic-bezier(0.4,0,0.2,1);
-  }
-
-  @keyframes msgIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .msg-avatar {
-    width: 34px;
-    height: 34px;
-    border-radius: 11px;
-    background: linear-gradient(135deg, var(--orange), var(--yellow));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    color: #0a0a0a;
-    font-weight: 800;
-    font-size: 0.95rem;
-  }
-
-  .msg-bubble {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 16px;
-    border-top-left-radius: 4px;
-    padding: 12px 16px;
-    font-size: 0.92rem;
-    line-height: 1.5;
-    max-width: 100%;
-  }
-
-  .msg.user {
-    flex-direction: row-reverse;
-  }
-
-  .msg.user .msg-bubble {
-    background: linear-gradient(135deg, rgba(255,106,0,0.18), rgba(255,201,60,0.14));
-    border-color: rgba(255,140,66,0.3);
-    border-top-left-radius: 16px;
-    border-top-right-radius: 4px;
-    color: var(--text);
-  }
-
-  .msg.user .msg-avatar {
-    background: rgba(255,255,255,0.1);
-    color: var(--text);
-  }
-
-  .typing {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.88rem;
-    color: var(--text-dim);
-  }
-
-  .typing-dots {
-    display: inline-flex;
-    gap: 3px;
-  }
-
-  .typing-dots span {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--orange-soft);
-    animation: dotPulse 1.4s infinite;
-  }
-
-  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-  @keyframes dotPulse {
-    0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
-    30% { opacity: 1; transform: scale(1); }
-  }
-
-  .step-list {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-top: 8px;
-  }
-
-  .step-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.85rem;
-    color: var(--text-dim);
-    opacity: 0.4;
-    transition: all 0.3s;
-  }
-
-  .step-item.active { opacity: 1; color: var(--text); }
-  .step-item.done { opacity: 0.9; color: var(--yellow); }
-
-  .step-item .step-icon {
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
+  .page { flex: 1; padding: 24px; max-width: 900px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .tab { padding: 14px 22px; background: transparent; border: none; color: var(--text-dim); font-family: inherit; font-size: 0.9rem; font-weight: 500; cursor: pointer; position: relative; transition: color 0.2s; }
+  .tab:hover { color: var(--text); } .tab.active { color: var(--yellow); }
+  .tab.active::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--orange), var(--yellow)); border-radius: 2px; }
+  .tab-content { display: none; flex: 1; flex-direction: column; } .tab-content.active { display: flex; }
+  .brand-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .brand-mark { width: 42px; height: 42px; border-radius: 13px; background: linear-gradient(135deg, var(--orange) 0%, var(--yellow) 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(255,106,0,0.3); flex-shrink: 0; }
+  .brand-mark span { font-size: 1.3rem; font-weight: 800; color: #0a0a0a; }
+  .brand-row h1 { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; background: linear-gradient(90deg, #ffffff 0%, var(--yellow-soft) 60%, var(--orange) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .chat { flex: 1; display: flex; flex-direction: column; gap: 14px; padding-bottom: 20px; }
+  .msg { display: flex; gap: 10px; animation: msgIn 0.35s cubic-bezier(0.4,0,0.2,1); }
+  @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .msg-avatar { width: 34px; height: 34px; border-radius: 11px; background: linear-gradient(135deg, var(--orange), var(--yellow)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #0a0a0a; font-weight: 800; font-size: 0.95rem; }
+  .msg-bubble { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; border-top-left-radius: 4px; padding: 12px 16px; font-size: 0.92rem; line-height: 1.5; max-width: 100%; }
+  .msg.user { flex-direction: row-reverse; }
+  .msg.user .msg-bubble { background: linear-gradient(135deg, rgba(255,106,0,0.18), rgba(255,201,60,0.14)); border-color: rgba(255,140,66,0.3); border-top-left-radius: 16px; border-top-right-radius: 4px; color: var(--text); }
+  .msg.user .msg-avatar { background: rgba(255,255,255,0.1); color: var(--text); }
+  .typing { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--text-dim); }
+  .typing-dots { display: inline-flex; gap: 3px; }
+  .typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--orange-soft); animation: dotPulse 1.4s infinite; }
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; } .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes dotPulse { 0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); } 30% { opacity: 1; transform: scale(1); } }
+  .step-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+  .step-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-dim); opacity: 0.4; transition: all 0.3s; }
+  .step-item.active { opacity: 1; color: var(--text); } .step-item.done { opacity: 0.9; color: var(--yellow); }
+  .step-item .step-icon { width: 16px; height: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
   .step-item .step-icon svg { width: 14px; height: 14px; }
-
-  .input-area {
-    position: sticky;
-    bottom: 0;
-    padding: 16px 0;
-    background: linear-gradient(180deg, transparent, rgba(10,10,10,0.95) 40%);
-    margin-top: auto;
-  }
-
-  .input-row {
-    display: flex;
-    gap: 8px;
-    align-items: stretch;
-  }
-
-  .search-box {
-    flex: 1;
-    display: flex;
-    gap: 10px;
-    background: rgba(20,20,20,0.85);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 6px 6px 6px 18px;
-    backdrop-filter: blur(20px);
-    transition: all 0.3s ease;
-  }
-
-  .search-box:focus-within {
-    border-color: var(--border-hover);
-    box-shadow: 0 0 0 4px rgba(255,106,0,0.08), 0 12px 40px rgba(255,106,0,0.12);
-  }
-
-  .search-box input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--text);
-    font-size: 0.95rem;
-    font-family: inherit;
-    padding: 14px 0;
-  }
-
+  .input-area { position: sticky; bottom: 0; padding: 16px 0; background: linear-gradient(180deg, transparent, rgba(10,10,10,0.95) 40%); margin-top: auto; }
+  .input-row { display: flex; gap: 8px; align-items: stretch; }
+  .search-box { flex: 1; display: flex; gap: 10px; background: rgba(20,20,20,0.85); border: 1px solid var(--border); border-radius: 16px; padding: 6px 6px 6px 18px; backdrop-filter: blur(20px); transition: all 0.3s ease; }
+  .search-box:focus-within { border-color: var(--border-hover); box-shadow: 0 0 0 4px rgba(255,106,0,0.08), 0 12px 40px rgba(255,106,0,0.12); }
+  .search-box input { flex: 1; background: transparent; border: none; outline: none; color: var(--text); font-size: 0.95rem; font-family: inherit; padding: 14px 0; }
   .search-box input::placeholder { color: rgba(245,245,245,0.35); }
-
-  .search-box button {
-    padding: 0 26px;
-    border: none;
-    border-radius: 12px;
-    background: linear-gradient(135deg, var(--orange) 0%, var(--yellow) 100%);
-    color: #0a0a0a;
-    font-size: 0.9rem;
-    font-weight: 700;
-    font-family: inherit;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
+  .search-box button { padding: 0 26px; border: none; border-radius: 12px; background: linear-gradient(135deg, var(--orange) 0%, var(--yellow) 100%); color: #0a0a0a; font-size: 0.9rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: all 0.25s ease; display: flex; align-items: center; gap: 6px; }
   .search-box button svg { width: 16px; height: 16px; }
-
-  .search-box button:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 10px 28px rgba(255,140,66,0.4);
-  }
-
+  .search-box button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 10px 28px rgba(255,140,66,0.4); }
   .search-box button:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  .clear-btn {
-    padding: 0 18px;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 16px;
-    background: rgba(20,20,20,0.85);
-    color: var(--text-dim);
-    font-family: inherit;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-
-  .clear-btn:hover {
-    color: var(--text);
-    border-color: rgba(255,140,66,0.35);
-  }
-
-  .filters {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin: 14px 0 8px;
-  }
-
-  .filter-block {
-    background: rgba(20,20,20,0.5);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 14px;
-    padding: 14px 16px;
-  }
-
-  .filter-title {
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-bottom: 10px;
-  }
-
-  .filter-options {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .filter-opt {
-    padding: 9px 12px;
-    border-radius: 9px;
-    background: transparent;
-    border: 1px solid transparent;
-    color: var(--text-dim);
-    font-size: 0.85rem;
-    font-family: inherit;
-    text-align: left;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .filter-opt:hover {
-    color: var(--text);
-    background: rgba(255,255,255,0.03);
-  }
-
-  .filter-opt.active {
-    background: linear-gradient(135deg, rgba(255,106,0,0.14), rgba(255,201,60,0.1));
-    border-color: rgba(255,140,66,0.35);
-    color: var(--text);
-    font-weight: 500;
-  }
-
-  .custom-price {
-    display: none;
-    margin-top: 10px;
-    gap: 6px;
-  }
-
-  .custom-price.show { display: block; }
-
-  .custom-price input {
-    width: 100%;
-    padding: 8px 10px;
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.1);
-    background: rgba(10,10,10,0.6);
-    color: var(--text);
-    font-family: inherit;
-    font-size: 0.82rem;
-    outline: none;
-    margin-bottom: 6px;
-  }
-
-  .custom-price input:focus {
-    border-color: var(--border-hover);
-  }
-
-  .products {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 14px;
-    margin-top: 8px;
-  }
-
-  .card {
-    background: linear-gradient(180deg, rgba(30,25,20,0.7) 0%, rgba(15,12,10,0.85) 100%);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 16px;
-    padding: 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-  }
-
-  .card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 18px 44px rgba(255,106,0,0.15);
-    border-color: rgba(255,140,66,0.25);
-  }
-
-  .card-img {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    border-radius: 10px;
-    background: rgba(255,255,255,0.03);
-    object-fit: cover;
-    display: block;
-  }
-
-  .card-name {
-    font-size: 0.86rem;
-    font-weight: 500;
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    min-height: 2.4em;
-  }
-
-  .card-price {
-    font-size: 1.25rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    background: linear-gradient(90deg, var(--yellow) 0%, var(--orange) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .card-seller {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.78rem;
-    color: var(--text-dim);
-  }
-
+  .clear-btn { padding: 0 18px; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; background: rgba(20,20,20,0.85); color: var(--text-dim); font-family: inherit; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+  .clear-btn:hover { color: var(--text); border-color: rgba(255,140,66,0.35); }
+  .filters { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 14px 0 8px; }
+  .filter-block { background: rgba(20,20,20,0.5); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 14px 16px; }
+  .filter-title { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+  .filter-title .chevron { transition: transform 0.25s; color: var(--text-dim); }
+  .filter-title .chevron.open { transform: rotate(180deg); }
+  .filter-options { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; overflow: hidden; max-height: 200px; transition: max-height 0.3s, opacity 0.3s, margin-top 0.3s; }
+  .filter-options.collapsed { max-height: 0; opacity: 0; margin-top: 0; }
+  .filter-opt { padding: 9px 12px; border-radius: 9px; background: transparent; border: 1px solid transparent; color: var(--text-dim); font-size: 0.85rem; font-family: inherit; text-align: left; cursor: pointer; transition: all 0.2s; }
+  .filter-opt:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .filter-opt.active { background: linear-gradient(135deg, rgba(255,106,0,0.14), rgba(255,201,60,0.1)); border-color: rgba(255,140,66,0.35); color: var(--text); font-weight: 500; }
+  .custom-price { display: none; margin-top: 10px; } .custom-price.show { display: block; }
+  .custom-price input { width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(10,10,10,0.6); color: var(--text); font-family: inherit; font-size: 0.82rem; outline: none; margin-bottom: 6px; }
+  .custom-price input:focus { border-color: var(--border-hover); }
+  .help-buttons { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .help-btn { padding: 10px 14px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(--text); font-family: inherit; font-size: 0.85rem; text-align: left; cursor: pointer; transition: all 0.2s; }
+  .help-btn:hover { background: rgba(255,140,66,0.1); border-color: rgba(255,140,66,0.3); }
+  .products { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-top: 8px; }
+  .card { background: linear-gradient(180deg, rgba(30,25,20,0.7) 0%, rgba(15,12,10,0.85) 100%); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px; transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 18px 44px rgba(255,106,0,0.15); border-color: rgba(255,140,66,0.25); }
+  .card-img { width: 100%; aspect-ratio: 1 / 1; border-radius: 10px; background: rgba(255,255,255,0.03); object-fit: cover; display: block; }
+  .card-name { font-size: 0.86rem; font-weight: 500; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.4em; }
+  .card-price { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; background: linear-gradient(90deg, var(--yellow) 0%, var(--orange) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .card-seller { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; color: var(--text-dim); }
   .card-seller svg { width: 12px; height: 12px; color: var(--yellow); }
-
-  .card-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    padding: 9px;
-    border-radius: 9px;
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.1);
-    color: var(--text-dim);
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 0.8rem;
-    transition: all 0.22s;
-    margin-top: auto;
-  }
-
-  .card-link:hover {
-    background: rgba(255,255,255,0.05);
-    border-color: rgba(255,140,66,0.35);
-    color: var(--orange-soft);
-  }
-
+  .card-link { display: flex; align-items: center; justify-content: center; gap: 5px; padding: 9px; border-radius: 9px; background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--text-dim); text-decoration: none; font-weight: 500; font-size: 0.8rem; transition: all 0.22s; margin-top: auto; }
+  .card-link:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,140,66,0.35); color: var(--orange-soft); }
   .card-link svg { width: 13px; height: 13px; }
-
-  .empty {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 50px 20px;
-    color: var(--text-dim);
-    font-size: 0.9rem;
-  }
-
-  .footer {
-    border-top: 1px solid rgba(255,255,255,0.06);
-    padding: 18px 24px;
-    text-align: center;
-    font-size: 0.78rem;
-    color: var(--text-dim);
-  }
-
-  .footer-brand {
-    font-weight: 600;
-    background: linear-gradient(90deg, var(--yellow-soft), var(--orange));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .about-content {
-    max-width: 640px;
-    margin: 0 auto;
-    padding-bottom: 40px;
-  }
-
-  .about-content h2 {
-    font-size: 1.35rem;
-    font-weight: 700;
-    margin-bottom: 16px;
-    background: linear-gradient(90deg, var(--yellow-soft), var(--orange));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .about-content h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    margin: 22px 0 10px;
-    color: var(--text);
-  }
-
-  .about-content p {
-    font-size: 0.92rem;
-    line-height: 1.6;
-    color: var(--text-dim);
-    margin-bottom: 12px;
-  }
-
-  .about-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin: 12px 0;
-  }
-
-  .about-list li {
-    display: flex;
-    gap: 10px;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    color: var(--text);
-  }
-
-  .about-list li::before {
-    content: '';
-    flex-shrink: 0;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--orange), var(--yellow));
-    margin-top: 8px;
-    box-shadow: 0 0 8px rgba(255,140,66,0.5);
-  }
-
-  .about-note {
-    margin-top: 22px;
-    padding: 14px 16px;
-    border-radius: 12px;
-    background: rgba(255,140,66,0.06);
-    border: 1px solid rgba(255,140,66,0.15);
-    font-size: 0.83rem;
-    color: var(--text-dim);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .about-note .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--yellow);
-    box-shadow: 0 0 10px var(--yellow);
-    animation: pulse 2s infinite;
-    flex-shrink: 0;
-  }
-
+  .empty { grid-column: 1 / -1; text-align: center; padding: 50px 20px; color: var(--text-dim); font-size: 0.9rem; }
+  .footer { border-top: 1px solid rgba(255,255,255,0.06); padding: 18px 24px; text-align: center; font-size: 0.78rem; color: var(--text-dim); }
+  .footer-brand { font-weight: 600; background: linear-gradient(90deg, var(--yellow-soft), var(--orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .about-content { max-width: 640px; margin: 0 auto; padding-bottom: 40px; }
+  .about-content h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 16px; background: linear-gradient(90deg, var(--yellow-soft), var(--orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .about-content h3 { font-size: 1rem; font-weight: 600; margin: 22px 0 10px; color: var(--text); }
+  .about-content p { font-size: 0.92rem; line-height: 1.6; color: var(--text-dim); margin-bottom: 12px; }
+  .about-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
+  .about-list li { display: flex; gap: 10px; font-size: 0.9rem; line-height: 1.5; color: var(--text); }
+  .about-list li::before { content: ''; flex-shrink: 0; width: 6px; height: 6px; border-radius: 50%; background: linear-gradient(135deg, var(--orange), var(--yellow)); margin-top: 8px; box-shadow: 0 0 8px rgba(255,140,66,0.5); }
+  .about-note { margin-top: 22px; padding: 14px 16px; border-radius: 12px; background: rgba(255,140,66,0.06); border: 1px solid rgba(255,140,66,0.15); font-size: 0.83rem; color: var(--text-dim); display: flex; align-items: center; gap: 10px; }
+  .about-note .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 10px var(--yellow); animation: pulse 2s infinite; flex-shrink: 0; }
   @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
-
   @media (max-width: 640px) {
     .page { padding: 16px; }
     .filters { grid-template-columns: 1fr; }
@@ -609,14 +113,12 @@
 <body>
 
 <div class="page">
-
   <div class="tabs">
     <button class="tab active" data-tab="search">Поиск</button>
     <button class="tab" data-tab="about">О сайте</button>
   </div>
 
   <div class="tab-content active" id="tab-search">
-
     <div class="brand-row">
       <div class="brand-mark"><span>L</span></div>
       <h1>Low Price</h1>
@@ -627,15 +129,21 @@
     <div class="input-area">
       <div class="filters" id="filters" style="display:none;">
         <div class="filter-block">
-          <div class="filter-title">Рейтинг</div>
-          <div class="filter-options" data-group="rating">
+          <div class="filter-title" data-target="ratingOptions">
+            <span>Рейтинг</span>
+            <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </div>
+          <div class="filter-options" id="ratingOptions">
             <button class="filter-opt active" data-value="any">Любой</button>
             <button class="filter-opt" data-value="high">Высокий рейтинг</button>
           </div>
         </div>
         <div class="filter-block">
-          <div class="filter-title">Цена</div>
-          <div class="filter-options" data-group="price">
+          <div class="filter-title" data-target="priceOptions">
+            <span>Цена</span>
+            <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </div>
+          <div class="filter-options" id="priceOptions">
             <button class="filter-opt active" data-value="asc">От дешёвого к дорогому</button>
             <button class="filter-opt" data-value="desc">От дорогого к дешёвому</button>
             <button class="filter-opt" data-value="custom">Свой выбор</button>
@@ -651,25 +159,19 @@
         <div class="search-box">
           <input type="text" id="query" placeholder="Напиши название товара или спроси, что я умею...">
           <button id="searchBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             Найти
           </button>
         </div>
         <button class="clear-btn" id="clearBtn">Очистить</button>
       </div>
     </div>
-
   </div>
 
   <div class="tab-content" id="tab-about">
     <div class="about-content">
       <h2>О Low Price</h2>
-
       <p>Low Price — это умный помощник для поиска выгодных предложений на цифровые товары. Мы собираем данные о ценах, продавцах и рейтингах из разных источников и показываем только то, что действительно стоит внимания.</p>
-
       <h3>Что мы ищем</h3>
       <ul class="about-list">
         <li>Игры, дополнения, внутриигровая валюта и подписки.</li>
@@ -677,14 +179,12 @@
         <li>Подарочные карты и цифровые коды.</li>
         <li>Аккаунты и услуги от проверенных продавцов.</li>
       </ul>
-
       <h3>Как это работает</h3>
       <ul class="about-list">
         <li>Ты пишешь название товара, который хочешь купить выгодно.</li>
         <li>Мы ищем предложения, собираем картинки, информацию о продавце и его рейтинге.</li>
         <li>Показываем результат — ты сам выбираешь, что тебе подходит.</li>
       </ul>
-
       <h3>Преимущества</h3>
       <ul class="about-list">
         <li>Не нужно переходить по десяткам сайтов и сравнивать вручную.</li>
@@ -692,14 +192,12 @@
         <li>Данные обновляются в реальном времени при каждом запросе.</li>
         <li>Никакой регистрации и лишних шагов — написал и получил результат.</li>
       </ul>
-
       <div class="about-note">
         <span class="dot"></span>
         <span>Данные в реальном времени — напрямую от продавцов и площадок</span>
       </div>
     </div>
   </div>
-
 </div>
 
 <footer class="footer">
@@ -708,6 +206,7 @@
 
 <script>
 const API_URL = '/api/search';
+const AI_URL = '/api/ai';
 let currentProducts = [];
 let chatInitialized = false;
 let filterState = { rating: 'any', price: 'asc' };
@@ -719,19 +218,14 @@ const spinnerSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" s
 
 const PLACEHOLDER_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300"><rect width="300" height="300" fill="#1a1a1a"/><text x="150" y="155" font-family="sans-serif" font-size="14" fill="#666" text-anchor="middle">Нет фото</text></svg>');
 
-/* Слова-паразиты, которые убираем из запроса */
 const STOP_WORDS = ['хочу', 'хотел', 'хотела', 'купить', 'куплю', 'найти', 'найди', 'ищу', 'поищи', 'можно', 'где', 'мне', 'бы', 'надо', 'нужно', 'пожалуйста', 'плиз', 'привет', 'здравствуй', 'помоги', 'помогите', 'подскажи', 'подскажите', 'дай', 'дайте', 'есть', 'ли', 'у', 'меня'];
-
-/* Фразы, на которые бот отвечает помощью, а не ищет */
-const HELP_PHRASES = ['как', 'что ты умеешь', 'помощь', 'help', 'ты кто', 'как работает', 'что делать', 'что можешь'];
+const HELP_PHRASES = ['помощь', 'help', 'что ты умеешь', 'как работает'];
 
 function cleanQuery(raw) {
   let query = raw.toLowerCase();
-  // Убираем слова-паразиты как отдельные слова
   STOP_WORDS.forEach(word => {
     query = query.replace(new RegExp(`(^|\\s)${word}(\\s|$)`, 'gi'), ' ');
   });
-  // Убираем лишние пробелы и знаки
   query = query.replace(/[?!.,]+/g, ' ').replace(/\s+/g, ' ').trim();
   return query;
 }
@@ -743,14 +237,10 @@ function isHelpRequest(text) {
 
 function escapeHtml(str) {
   return String(str || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
-/* Вкладки */
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -760,7 +250,6 @@ document.querySelectorAll('.tab').forEach(tab => {
   });
 });
 
-/* Чат */
 const chat = document.getElementById('chat');
 const filters = document.getElementById('filters');
 
@@ -788,19 +277,25 @@ function scrollChat() {
 function initChat() {
   if (chatInitialized) return;
   chatInitialized = true;
-
-  addAIMessage('Привет! Я помогу найти выгодные предложения на цифровые товары: игры, подписки, ключи, аккаунты. Напиши название — например, «Steam Balance» или «PlayStation Plus». Если что-то непонятно — спроси, я подскажу.');
-
-  setTimeout(() => {
-    filters.style.display = 'grid';
-  }, 600);
+  addAIMessage('Привет! Я помогу найти выгодные предложения на цифровые товары. Напиши название — например, «Steam Balance». Если хочешь узнать, что я умею, напиши «помощь».');
+  setTimeout(() => { filters.style.display = 'grid'; }, 600);
 }
 
 initChat();
 
-/* Фильтры */
+// Сворачивание фильтров
+document.querySelectorAll('.filter-title').forEach(title => {
+  title.addEventListener('click', () => {
+    const target = document.getElementById(title.dataset.target);
+    const chevron = title.querySelector('.chevron');
+    target.classList.toggle('collapsed');
+    chevron.classList.toggle('open');
+  });
+});
+
+// Фильтры
 document.querySelectorAll('.filter-options').forEach(group => {
-  const groupName = group.dataset.group;
+  const groupName = group.dataset.group || group.id.replace('Options', '');
   group.querySelectorAll('.filter-opt').forEach(btn => {
     btn.addEventListener('click', () => {
       group.querySelectorAll('.filter-opt').forEach(b => b.classList.remove('active'));
@@ -809,11 +304,7 @@ document.querySelectorAll('.filter-options').forEach(group => {
 
       if (groupName === 'price') {
         const custom = document.getElementById('customPrice');
-        if (btn.dataset.value === 'custom') {
-          custom.classList.add('show');
-        } else {
-          custom.classList.remove('show');
-        }
+        custom.classList.toggle('show', btn.dataset.value === 'custom');
       }
 
       if (currentProducts.length > 0) renderProducts();
@@ -824,7 +315,6 @@ document.querySelectorAll('.filter-options').forEach(group => {
 document.getElementById('minPrice').addEventListener('input', () => { if (currentProducts.length > 0) renderProducts(); });
 document.getElementById('maxPrice').addEventListener('input', () => { if (currentProducts.length > 0) renderProducts(); });
 
-/* Кнопка очистки */
 document.getElementById('clearBtn').addEventListener('click', () => {
   chat.innerHTML = '';
   currentProducts = [];
@@ -832,7 +322,6 @@ document.getElementById('clearBtn').addEventListener('click', () => {
   filterState = { rating: 'any', price: 'asc' };
   filters.style.display = 'none';
 
-  // Сброс активных кнопок фильтров
   document.querySelectorAll('.filter-options').forEach(group => {
     group.querySelectorAll('.filter-opt').forEach((b, i) => {
       b.classList.toggle('active', i === 0);
@@ -843,7 +332,6 @@ document.getElementById('clearBtn').addEventListener('click', () => {
   initChat();
 });
 
-/* Шаги */
 function createStepsBubble() {
   const bubble = addAIMessage('');
   bubble.innerHTML = `
@@ -874,25 +362,58 @@ function markStepActive(bubble, stepName) {
   el.classList.add('active');
 }
 
+function showHelpButtons() {
+  const buttons = [
+    'Как искать товар?',
+    'Как работает сортировка?',
+    'Какие товары можно найти?',
+  ];
+  const html = `
+    <div>Я умею искать выгодные предложения на цифровые товары. Вот что можно спросить:</div>
+    <div class="help-buttons">
+      ${buttons.map(b => `<button class="help-btn" data-question="${escapeHtml(b)}">${escapeHtml(b)}</button>`).join('')}
+    </div>
+  `;
+  const bubble = addAIMessage(html);
+  bubble.querySelectorAll('.help-btn').forEach(btn => {
+    btn.addEventListener('click', () => askAI(btn.dataset.question));
+  });
+}
+
+async function askAI(question) {
+  addUserMessage(question);
+  const bubble = addAIMessage('<div class="typing">Думаю<span class="typing-dots"><span></span><span></span><span></span></span></div>');
+
+  try {
+    const res = await fetch(`${AI_URL}?prompt=${encodeURIComponent(question)}`);
+    const data = await res.json();
+
+    if (data.error) {
+      bubble.textContent = 'Ошибка ИИ: ' + data.error;
+      return;
+    }
+    bubble.textContent = data.reply;
+  } catch (e) {
+    bubble.textContent = 'Ошибка сети: ' + e.message;
+  }
+}
+
 async function search() {
   const raw = document.getElementById('query').value.trim();
   if (!raw) return;
 
-  // Проверка: это вопрос о помощи или поиск товара?
   if (isHelpRequest(raw)) {
     addUserMessage(raw);
     document.getElementById('query').value = '';
-    addAIMessage('Я помогаю искать выгодные предложения на цифровые товары: игры, подписки, ключи активации, аккаунты. Просто напиши название, и я найду цены. Например: «Steam Balance», «PlayStation Plus», «Discord Nitro». Сортировка по цене и рейтингу продавца — настраивается кнопками внизу.');
+    showHelpButtons();
     return;
   }
 
-  // Очищаем запрос от мусорных слов
   const query = cleanQuery(raw);
-
   if (query.length < 3) {
     addUserMessage(raw);
     document.getElementById('query').value = '';
-    addAIMessage('Не могу разобрать запрос. Напиши название товара, например «Steam Balance» или «PlayStation Plus».');
+    addAIMessage('Не могу разобрать запрос. Напиши название товара, например «Steam Balance».');
     return;
   }
 
@@ -903,7 +424,6 @@ async function search() {
   btn.disabled = true;
 
   const bubble = createStepsBubble();
-
   const steps = ['products', 'images', 'seller', 'rating'];
   let currentStepIndex = 0;
   markStepActive(bubble, steps[0]);
@@ -912,9 +432,7 @@ async function search() {
     if (currentStepIndex < steps.length) {
       markStepDone(bubble, steps[currentStepIndex]);
       currentStepIndex++;
-      if (currentStepIndex < steps.length) {
-        markStepActive(bubble, steps[currentStepIndex]);
-      }
+      if (currentStepIndex < steps.length) markStepActive(bubble, steps[currentStepIndex]);
     }
   }, 700);
 
@@ -925,7 +443,6 @@ async function search() {
     clearInterval(stepTimer);
     steps.forEach(s => markStepDone(bubble, s));
 
-    // Скрываем «Ищу ●●●»
     const typing = bubble.querySelector('.typing');
     if (typing) typing.style.display = 'none';
 
@@ -935,9 +452,8 @@ async function search() {
     }
 
     currentProducts = data.products || [];
-
     if (currentProducts.length === 0) {
-      addAIMessage(`По запросу «${escapeHtml(query)}» ничего не найдено. Попробуй другое название или переформулируй.`);
+      addAIMessage(`По запросу «${escapeHtml(query)}» ничего не найдено. Попробуй другое название.`);
       return;
     }
 
@@ -1002,7 +518,6 @@ function renderProducts() {
 document.getElementById('searchBtn').addEventListener('click', search);
 document.getElementById('query').addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
 
-/* Анимация спиннера для SVG */
 const styleEl = document.createElement('style');
 styleEl.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
 document.head.appendChild(styleEl);
