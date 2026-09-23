@@ -1,35 +1,6 @@
-const { Curl, CurlOpt, Browser } = require('node-libcurl-ja3');
+const { execSync } = require('child_process');
 
 const DEST = '-1257786';
-
-function fetchWB(url) {
-  return new Promise((resolve, reject) => {
-    const curl = Curl.impersonate(Browser.Chrome);
-
-    curl.setOpt(CurlOpt.Url, url);
-    curl.setOpt(CurlOpt.FollowLocation, 1);
-    curl.setOpt(CurlOpt.TimeoutMs, 15000);
-    curl.setOpt(CurlOpt.HttpHeader, [
-      'Accept: application/json',
-      'Accept-Language: ru-RU,ru;q=0.9',
-    ]);
-
-    curl.on('end', (statusCode, data) => {
-      curl.close();
-      if (statusCode !== 200) {
-        return reject(new Error(`WB вернул статус ${statusCode}`));
-      }
-      resolve(data);
-    });
-
-    curl.on('error', (err) => {
-      curl.close();
-      reject(err);
-    });
-
-    curl.perform();
-  });
-}
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -40,12 +11,13 @@ module.exports = async (req, res) => {
   try {
     const url = `https://search.wb.ru/exactmatch/ru/common/v9/search?ab_testing=false&appType=1&curr=rub&dest=${DEST}&query=${encodeURIComponent(query)}&resultset=catalog&sort=popular&spp=30&suppressSpellcheck=false`;
 
-    const raw = await fetchWB(url);
-    const data = JSON.parse(raw);
+    const raw = execSync(
+      `curl -s --tlsv1.2 --http2 -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36" -H "Accept: application/json" "${url}"`,
+      { encoding: 'utf-8', timeout: 15000 }
+    );
 
-    if (!data.data || !data.data.products) {
-      return res.json({ products: [] });
-    }
+    const data = JSON.parse(raw);
+    if (!data.data || !data.data.products) return res.json({ products: [] });
 
     const products = data.data.products.map(p => ({
       id: p.id,
