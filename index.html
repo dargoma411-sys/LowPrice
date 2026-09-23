@@ -628,7 +628,7 @@ function render() {
 
   products.innerHTML = filtered.map(p => `
     <div class="card">
-      <img class="card-img" src="${escapeHtml(p.image || PLACEHOLDER_IMG)}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'">
+      <img class="card-img" src="/api/image?url=${encodeURIComponent(p.image || '')}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'">
       ${p.brand ? `<div class="card-brand">${escapeHtml(p.brand)}</div>` : ''}
       <div class="card-name">${escapeHtml(p.name)}</div>
       <div class="card-price-row">
