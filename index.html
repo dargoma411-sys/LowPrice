@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Сравни Цены — Wildberries</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --black: #0a0a0a;
+    --dark: #141414;
+    --orange: #ff6a00;
+    --orange-soft: #ff8c42;
+    --yellow: #ffc93c;
+    --yellow-soft: #ffe08a;
+    --text: #f5f5f5;
+    --text-dim: rgba(245,245,245,0.55);
+    --border: rgba(255,140,66,0.18);
+    --border-hover: rgba(255,140,66,0.55);
+    --glass: rgba(255,255,255,0.04);
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(255,106,0,0.18), transparent 55%),
+      radial-gradient(ellipse at 85% 15%, rgba(255,201,60,0.12), transparent 50%),
+      linear-gradient(160deg, #0a0a0a 0%, #15100a 45%, #0a0a0a 100%);
+    color: var(--text);
+    padding: 24px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container { max-width: 1240px; margin: 0 auto; }
+
+  /* Заголовок */
+  .header {
+    padding: 50px 0 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .brand-mark {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--orange) 0%, var(--yellow) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 28px rgba(255,106,0,0.35);
+  }
+
+  .brand-mark svg { width: 24px; height: 24px; }
+
+  .brand-text h1 {
+    font-size: 1.55rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(90deg, #ffffff 0%, var(--yellow-soft) 60%, var(--orange) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+  }
+
+  .brand-text p {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-top: 3px;
+    letter-spacing: 0.01em;
+  }
+
+  .header-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+  }
+
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--yellow);
+    box-shadow: 0 0 12px var(--yellow);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* Поиск */
+  .search-wrap {
+    position: relative;
+    margin-bottom: 24px;
+  }
+
+  .search-box {
+    display: flex;
+    gap: 12px;
+    background: rgba(20,20,20,0.7);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 8px 8px 8px 22px;
+    backdrop-filter: blur(20px);
+    transition: all 0.3s ease;
+  }
+
+  .search-box:focus-within {
+    border-color: var(--border-hover);
+    box-shadow: 0 0 0 4px rgba(255,106,0,0.08), 0 12px 40px rgba(255,106,0,0.12);
+  }
+
+  .search-icon {
+    display: flex;
+    align-items: center;
+    color: var(--text-dim);
+  }
+
+  .search-icon svg { width: 20px; height: 20px; }
+
+  .search-box input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 1rem;
+    font-family: inherit;
+    padding: 16px 0;
+  }
+
+  .search-box input::placeholder { color: rgba(245,245,245,0.35); }
+
+  .search-box button {
+    padding: 0 34px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--orange) 0%, var(--yellow) 100%);
+    color: #0a0a0a;
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: inherit;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .search-box button svg { width: 18px; height: 18px; }
+
+  .search-box button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 32px rgba(255,140,66,0.4);
+  }
+
+  .search-box button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  /* Фильтры */
+  .filters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    padding: 20px;
+    background: rgba(20,20,20,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 18px;
+    backdrop-filter: blur(20px);
+    margin-bottom: 32px;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .filter-group label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding-left: 2px;
+  }
+
+  .filter-group select,
+  .filter-group input {
+    padding: 12px 14px;
+    border-radius: 11px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(10,10,10,0.6);
+    color: var(--text);
+    font-size: 0.9rem;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.2s;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  .filter-group select:focus,
+  .filter-group input:focus {
+    border-color: var(--border-hover);
+    background: rgba(10,10,10,0.9);
+  }
+
+  .filter-group select option { background: #141414; color: var(--text); }
+  .filter-group input::placeholder { color: rgba(245,245,245,0.3); }
+
+  .filter-group input[type="number"]::-webkit-outer-spin-button,
+  .filter-group input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 11px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(10,10,10,0.6);
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s;
+  }
+
+  .toggle-wrap:hover { border-color: var(--border-hover); }
+
+  .toggle-wrap input { display: none; }
+
+  .toggle-track {
+    width: 38px;
+    height: 22px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.12);
+    position: relative;
+    transition: all 0.25s;
+    flex-shrink: 0;
+  }
+
+  .toggle-track::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    transition: all 0.25s;
+  }
+
+  .toggle-wrap input:checked + .toggle-track {
+    background: linear-gradient(135deg, var(--orange), var(--yellow));
+  }
+
+  .toggle-wrap input:checked + .toggle-track::after {
+    transform: translateX(16px);
+    background: #0a0a0a;
+  }
+
+  .toggle-label { font-size: 0.88rem; font-weight: 500; }
+
+  /* Статус */
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 0;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+  }
+
+  .status svg { width: 18px; height: 18px; color: var(--orange-soft); }
+
+  .count-badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: rgba(255,140,66,0.12);
+    border: 1px solid rgba(255,140,66,0.25);
+    color: var(--orange-soft);
+    font-weight: 600;
+    font-size: 0.8rem;
+  }
+
+  /* Сетка товаров */
+  .products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 18px;
+    margin-top: 8px;
+  }
+
+  .card {
+    background: linear-gradient(180deg, rgba(30,25,20,0.7) 0%, rgba(15,12,10,0.85) 100%);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 18px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    padding: 1px;
+    background: linear-gradient(135deg, transparent 40%, rgba(255,140,66,0.5), rgba(255,201,60,0.5));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 50px rgba(255,106,0,0.15);
+  }
+
+  .card:hover::before { opacity: 1; }
+
+  .card-img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.03);
+    object-fit: cover;
+    display: block;
+  }
+
+  .card-brand {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--orange-soft);
+  }
+
+  .card-name {
+    font-size: 0.92rem;
+    font-weight: 500;
+    line-height: 1.45;
+    color: var(--text);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.6em;
+  }
+
+  .card-price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: auto;
+  }
+
+  .card-price {
+    font-size: 1.45rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(90deg, var(--yellow) 0%, var(--orange) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .card-old-price {
+    font-size: 0.85rem;
+    color: rgba(245,245,245,0.35);
+    text-decoration: line-through;
+  }
+
+  .card-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+  }
+
+  .card-rating svg { width: 14px; height: 14px; color: var(--yellow); }
+
+  .card-rating strong { color: var(--text); font-weight: 600; }
+
+  .card-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(255,140,66,0.08);
+    border: 1px solid rgba(255,140,66,0.2);
+    color: var(--orange-soft);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.25s;
+  }
+
+  .card-link svg { width: 15px; height: 15px; transition: transform 0.25s; }
+
+  .card-link:hover {
+    background: linear-gradient(135deg, var(--orange), var(--yellow));
+    color: #0a0a0a;
+    border-color: transparent;
+    box-shadow: 0 10px 26px rgba(255,140,66,0.3);
+  }
+
+  .card-link:hover svg { transform: translateX(3px); }
+
+  /* Пустое состояние */
+  .empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--text-dim);
+  }
+
+  .empty svg {
+    width: 52px; height: 52px;
+    color: rgba(255,140,66,0.4);
+    margin-bottom: 18px;
+  }
+
+  .empty p { font-size: 1rem; }
+
+  @media (max-width: 640px) {
+    body { padding: 16px; }
+    .header { padding: 30px 0 24px; }
+    .brand-text h1 { font-size: 1.25rem; }
+    .search-box { flex-direction: column; padding: 12px; gap: 10px; }
+    .search-icon { display: none; }
+    .search-box input { padding: 12px 8px; }
+    .search-box button { padding: 14px; justify-content: center; width: 100%; }
+    .filters { grid-template-columns: 1fr; padding: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="header">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="20" y1="20" x2="16.65" y2="16.65"></line>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>Сравни Цены</h1>
+        <p>Поиск выгодных предложений на Wildberries</p>
+      </div>
+    </div>
+    <div class="header-meta">
+      <span class="dot"></span>
+      <span>Данные в реальном времени</span>
+    </div>
+  </header>
+
+  <div class="search-wrap">
+    <div class="search-box">
+      <span class="search-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="20" y1="20" x2="16.65" y2="16.65"></line>
+        </svg>
+      </span>
+      <input type="text" id="query" placeholder="Введите название, бренд или модель товара" value="iphone">
+      <button id="searchBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="20" y1="20" x2="16.65" y2="16.65"></line>
+        </svg>
+        Найти
+      </button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="filter-group">
+      <label>Сортировка</label>
+      <select id="sortBy">
+        <option value="price_asc">Цена: по возрастанию</option>
+        <option value="price_desc">Цена: по убыванию</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Цена от, ₽</label>
+      <input type="number" id="minPrice" placeholder="0">
+    </div>
+    <div class="filter-group">
+      <label>Цена до, ₽</label>
+      <input type="number" id="maxPrice" placeholder="∞">
+    </div>
+    <div class="filter-group">
+      <label>Рейтинг</label>
+      <select id="ratingSelect">
+        <option value="0">Любой</option>
+        <option value="3.5">от 3.5</option>
+        <option value="4">от 4.0</option>
+        <option value="4.5">от 4.5</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Опция</label>
+      <label class="toggle-wrap">
+        <input type="checkbox" id="highRating">
+        <span class="toggle-track"></span>
+        <span class="toggle-label">Только высокий рейтинг</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="status" id="status">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="16" x2="12" y2="12"></line>
+      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+    </svg>
+    <span id="statusText">Введите запрос и нажмите «Найти»</span>
+  </div>
+
+  <div class="products" id="products"></div>
+
+</div>
+
+<script>
+const API_URL = '/api/search';
+let currentProducts = [];
+
+const starSvg = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+const arrowSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
+const emptySvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="20" y1="20" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>';
+
+async function search() {
+  const query = document.getElementById('query').value.trim();
+  if (!query) return;
+
+  const btn = document.getElementById('searchBtn');
+  const statusText = document.getElementById('statusText');
+  const products = document.getElementById('products');
+
+  btn.disabled = true;
+  statusText.textContent = 'Поиск...';
+  products.innerHTML = '';
+
+  try {
+    const res = await fetch(`${API_URL}?query=${encodeURIComponent(query)}`);
+    const data = await res.json();
+
+    if (data.error) {
+      statusText.textContent = 'Ошибка: ' + data.error;
+      return;
+    }
+
+    currentProducts = data.products || [];
+    if (currentProducts.length === 0) {
+      statusText.textContent = 'Результатов нет';
+      products.innerHTML = `<div class="empty">${emptySvg}<p>Ничего не найдено по запросу «${query}»</p></div>`;
+      return;
+    }
+    render();
+  } catch (e) {
+    statusText.textContent = 'Ошибка сети: ' + e.message;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function render() {
+  const statusText = document.getElementById('statusText');
+  const products = document.getElementById('products');
+  const sortBy = document.getElementById('sortBy').value;
+  const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
+  const maxPrice = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+  const highRating = document.getElementById('highRating').checked;
+  const ratingSelect = parseFloat(document.getElementById('ratingSelect').value) || 0;
+
+  let filtered = currentProducts.filter(p => {
+    if (p.price < minPrice || p.price > maxPrice) return false;
+    if (highRating && p.rating < 4.5) return false;
+    if (p.rating < ratingSelect) return false;
+    return true;
+  });
+
+  if (sortBy === 'price_asc') filtered.sort((a, b) => a.price - b.price);
+  else filtered.sort((a, b) => b.price - a.price);
+
+  statusText.innerHTML = `Найдено <span class="count-badge">${filtered.length}</span> товаров`;
+
+  products.innerHTML = filtered.map(p => `
+    <div class="card">
+      <img class="card-img" src="${p.image || ''}" alt="" loading="lazy" onerror="this.style.opacity='0'">
+      ${p.brand ? `<div class="card-brand">${p.brand}</div>` : ''}
+      <div class="card-name">${p.name}</div>
+      <div class="card-price-row">
+        <span class="card-price">${p.price.toLocaleString('ru-RU')} ₽</span>
+        ${p.oldPrice && p.oldPrice > p.price ? `<span class="card-old-price">${p.oldPrice.toLocaleString('ru-RU')} ₽</span>` : ''}
+      </div>
+      <div class="card-rating">
+        ${starSvg}
+        <strong>${p.rating.toFixed(1)}</strong>
+        <span>· ${p.feedbacks || 0} отзывов</span>
+      </div>
+      <a class="card-link" href="${p.url}" target="_blank" rel="noopener">
+        Открыть на Wildberries
+        ${arrowSvg}
+      </a>
+    </div>
+  `).join('');
+}
+
+document.getElementById('searchBtn').addEventListener('click', search);
+document.getElementById('query').addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
+['sortBy','minPrice','maxPrice','highRating','ratingSelect'].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener('change', render);
+  el.addEventListener('input', render);
+});
+</script>
+</body>
+</html>
