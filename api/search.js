@@ -1,114 +1,69 @@
-const APIFY_TOKEN = process.env.APIFY_TOKEN;
-const ACTOR_ID = 'sian.agency~wildberries-product-scraper';
-
-// Кэш в памяти функции. Живёт, пока Vercel держит инстанс (обычно 5-15 мин после последнего запроса).
-const cache = new Map();
-const CACHE_TTL_MS = 15 * 60 * 1000; // 15 минут
-
-const PLACEHOLDER = 'data:image/svg+xml;utf8,' + encodeURIComponent(
-  '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300"><rect width="300" height="300" fill="#1a1a1a"/><text x="150" y="155" font-family="sans-serif" font-size="16" fill="#666" text-anchor="middle">Нет фото</text></svg>'
-);
-
-function getFromCache(key) {
-  const entry = cache.get(key);
-  if (!entry) return null;
-  if (Date.now() - entry.time > CACHE_TTL_MS) {
-    cache.delete(key);
-    return null;
-  }
-  return entry.data;
-}
-
-function setToCache(key, data) {
-  // Ограничиваем размер кэша, чтобы не сожрал память
-  if (cache.size > 100) {
-    const firstKey = cache.keys().next().value;
-    cache.delete(firstKey);
-  }
-  cache.set(key, { time: Date.now(), data });
-}
+const PLATI_BASE = 'https://plati.io/api/search.ashx';
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
 
   const query = req.query.query;
-  if (!query) return res.status(400).json({ error: 'Введите поисковый запрос' });
-  if (!APIFY_TOKEN) return res.status(500).json({ error: 'APIFY_TOKEN не настроен' });
-
-  const cacheKey = query.toLowerCase().trim();
-
-  // Проверяем кэш
-  const cached = getFromCache(cacheKey);
-  if (cached) {
-    console.log('Cache HIT for:', cacheKey);
-    res.setHeader('X-Cache', 'HIT');
-    return res.json({ products: cached });
+  if (!query || query.length < 3) {
+    return res.status(400).json({ error: 'Запрос должен быть минимум 3 символа' });
   }
 
-  console.log('Cache MISS for:', cacheKey);
-  res.setHeader('X-Cache', 'MISS');
-
   try {
-    const runRes = await fetch(
-      `https://api.apify.com/v2/acts/${ACTOR_ID}/run-sync-get-dataset-items?token=${APIFY_TOKEN}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          scrapeMode: 'overview',
-          searchMode: 'byQuery',
-          queries: [query],
-          maxResults: 25,
-          maxPages: 1,
-        }),
-      }
-    );
+    const url = `${PLATI_BASE}?query=${encodeURIComponent(query)}&pagesize=100&response=json`;
 
-    if (!runRes.ok) {
-      const text = await runRes.text();
-      console.error('Apify error:', runRes.status, text);
-      return res.status(500).json({ error: 'Ошибка Apify: ' + runRes.status });
+    const apiRes = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!apiRes.ok) {
+      console.error('Plati HTTP', apiRes.status);
+      return res.status(500).json({ error: 'Ошибка Plati: ' + apiRes.status });
     }
 
-    const items = await runRes.json();
+    const text = await apiRes.text();
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error('Plati вернул не JSON:', text.slice(0, 300));
+      return res.status(500).json({ error: 'Plati вернул некорректный ответ' });
+    }
+
+    // Plati отдаёт массив товаров внутри разных ключей в зависимости от версии API
+    const items = data?.items || data?.products || data?.data || data || [];
 
     if (!Array.isArray(items)) {
-      console.error('Неожиданный ответ Apify:', items);
+      console.error('Неожиданная структура Plati:', Object.keys(data));
       return res.json({ products: [] });
     }
 
-    const products = items.map(p => {
-      let img = p.thumbnail || null;
-
-      if (!img && Array.isArray(p.images) && p.images.length > 0) {
-        const first = p.images[0];
-        img = typeof first === 'string' ? first : (first?.url || first?.big || first?.c516x688 || null);
-      }
-
-      if (!img && p.image) img = p.image;
-      if (!img && p.imageUrl) img = p.imageUrl;
+    const products = items.map(item => {
+      // Plati может отдавать вложенные объекты, нормализуем
+      const name = item.name || item.title || item.product_name || '';
+      const price = parseFloat(item.price || item.price_rub || item.cost || 0);
+      const sellerRating = parseFloat(item.seller_rating || item.rating || 0);
+      const sellerName = item.seller || item.seller_name || '';
+      const url = item.url || item.product_url || (item.id ? `https://plati.io/itm/${item.id}/` : '');
+      const image = item.image || item.img || item.thumbnail || null;
 
       return {
-        id: p.id || p.nmId,
-        name: p.productTitle || p.name || '',
-        brand: p.brand || '',
-        price: p.price || p.salePrice || 0,
-        oldPrice: p.price_original || null,
-        rating: p.rating || 0,
-        feedbacks: p.feedbacks || 0,
-        image: img || PLACEHOLDER,
-        url: p.url || p.productUrl || `https://www.wildberries.ru/catalog/${p.id}/detail.aspx`,
+        id: item.id || item.product_id || name,
+        name,
+        price,
+        rating: sellerRating,
+        seller: sellerName,
+        image,
+        url,
       };
-    });
-
-    // Сохраняем в кэш только успешный непустой результат
-    if (products.length > 0) {
-      setToCache(cacheKey, products);
-    }
+    }).filter(p => p.name && p.price > 0);
 
     res.json({ products });
   } catch (e) {
-    console.error('Ошибка:', e.message);
+    console.error('Plati error:', e.message);
     res.status(500).json({ error: 'Ошибка при получении данных: ' + e.message });
   }
 };
