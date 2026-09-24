@@ -230,7 +230,6 @@ const HELP_PHRASES = [
   'спасибо', 'благодарю', 'пока', 'до свидания',
 ];
 
-// Слова-маркеры, по которым понимаем, что это запрос товара
 const PRODUCT_HINTS = [
   'игра', 'игры', 'игру', 'ключ', 'ключи', 'подписка', 'подписку', 'аккаунт',
   'стим', 'steam', 'ps', 'playstation', 'xbox', 'nitro', 'discord',
@@ -259,16 +258,13 @@ function looksLikeProduct(text) {
   const words = cleaned.split(' ').filter(w => w.length > 1);
   if (words.length === 0) return false;
 
-  // Если есть маркер товара — точно товар
   const lower = text.toLowerCase();
   if (PRODUCT_HINTS.some(hint => lower.includes(hint))) return true;
 
-  // Если есть цифры или латиница — тоже товар (модели, бренды)
   const hasDigits = /\d/.test(cleaned);
   const hasLatin = /[a-z]/i.test(cleaned);
   if (hasDigits || hasLatin) return true;
 
-  // Короткая фраза без маркеров, цифр и латиницы — скорее всего не товар
   if (words.length <= 3) return false;
 
   return true;
@@ -413,12 +409,14 @@ function showHelpButtons() {
   `;
   const bubble = addAIMessage(html);
   bubble.querySelectorAll('.help-btn').forEach(btn => {
-    btn.addEventListener('click', () => askAI(btn.dataset.question));
+    btn.addEventListener('click', () => {
+      addUserMessage(btn.dataset.question);
+      askAI(btn.dataset.question);
+    });
   });
 }
 
 async function askAI(question) {
-  addUserMessage(question);
   const bubble = addAIMessage('');
   bubble.innerHTML = '<div class="typing">Думаю<span class="typing-dots"><span></span><span></span><span></span></span></div>';
 
@@ -454,7 +452,6 @@ async function search() {
   const raw = document.getElementById('query').value.trim();
   if (!raw) return;
 
-  // Если это помощь/приветствие/не похоже на товар — отправляем в ИИ
   if (isHelpRequest(raw) || !looksLikeProduct(raw)) {
     addUserMessage(raw);
     document.getElementById('query').value = '';
@@ -502,7 +499,7 @@ async function search() {
     steps.forEach(s => markStepDone(bubble, s));
 
     const typing = bubble.querySelector('.typing');
-    if (typing) typing.style.display = 'none';
+    if (typing) typing.remove();
 
     if (data.error) {
       addAIMessage('Ошибка: ' + escapeHtml(data.error));
@@ -526,7 +523,7 @@ async function search() {
   } catch (e) {
     clearInterval(stepTimer);
     const typing = bubble.querySelector('.typing');
-    if (typing) typing.style.display = 'none';
+    if (typing) typing.remove();
     addAIMessage('Ошибка сети: ' + escapeHtml(e.message));
   } finally {
     btn.disabled = false;
