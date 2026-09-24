@@ -31,7 +31,7 @@ module.exports = async (req, res) => {
         'X-Title': 'Low Price',
       },
       body: JSON.stringify({
-        model: 'deepseek/deepseek-v4-flash:free',
+        model: 'openrouter/free',
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: prompt },
