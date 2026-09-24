@@ -32,10 +32,10 @@
   .brand-mark span { font-size: 1.3rem; font-weight: 800; color: #0a0a0a; }
   .brand-row h1 { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; background: linear-gradient(90deg, #ffffff 0%, var(--yellow-soft) 60%, var(--orange) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
   .chat { flex: 1; display: flex; flex-direction: column; gap: 14px; padding-bottom: 20px; }
-  .msg { display: flex; gap: 10px; animation: msgIn 0.35s cubic-bezier(0.4,0,0.2,1); }
+  .msg { display: flex; gap: 10px; animation: msgIn 0.35s cubic-bezier(0.4,0,0.2,1); align-items: flex-start; }
   @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
   .msg-avatar { width: 34px; height: 34px; border-radius: 11px; background: linear-gradient(135deg, var(--orange), var(--yellow)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #0a0a0a; font-weight: 800; font-size: 0.95rem; }
-  .msg-bubble { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; border-top-left-radius: 4px; padding: 12px 16px; font-size: 0.92rem; line-height: 1.5; max-width: 100%; white-space: pre-wrap; }
+  .msg-bubble { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; border-top-left-radius: 4px; padding: 12px 16px; font-size: 0.92rem; line-height: 1.5; max-width: calc(100% - 44px); word-wrap: break-word; }
   .msg.user { flex-direction: row-reverse; }
   .msg.user .msg-bubble { background: linear-gradient(135deg, rgba(255,106,0,0.18), rgba(255,201,60,0.14)); border-color: rgba(255,140,66,0.3); border-top-left-radius: 16px; border-top-right-radius: 4px; color: var(--text); }
   .msg.user .msg-avatar { background: rgba(255,255,255,0.1); color: var(--text); }
@@ -157,7 +157,7 @@
 
       <div class="input-row">
         <div class="search-box">
-          <input type="text" id="query" placeholder="Напиши название товара или спроси, что я умею...">
+          <input type="text" id="query" placeholder="Напиши название на английском или спроси, что я умею...">
           <button id="searchBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             Найти
@@ -181,7 +181,7 @@
       </ul>
       <h3>Как это работает</h3>
       <ul class="about-list">
-        <li>Ты пишешь название товара, который хочешь купить выгодно.</li>
+        <li>Ты пишешь название товара на английском языке, например «Steam Balance» или «PlayStation Plus».</li>
         <li>Мы ищем предложения, собираем картинки, информацию о продавце и его рейтинге.</li>
         <li>Показываем результат — ты сам выбираешь, что тебе подходит.</li>
       </ul>
@@ -205,11 +205,14 @@
 </footer>
 
 <script>
+console.log('Low Price v4 loaded');
+
 const API_URL = '/api/search';
 const AI_URL = '/api/ai';
 let currentProducts = [];
 let chatInitialized = false;
 let filterState = { rating: 'any', price: 'asc' };
+let isBusy = false;
 
 const starSvg = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
 const arrowSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
@@ -231,10 +234,9 @@ const HELP_PHRASES = [
 ];
 
 const PRODUCT_HINTS = [
-  'игра', 'игры', 'игру', 'ключ', 'ключи', 'подписка', 'подписку', 'аккаунт',
-  'стим', 'steam', 'ps', 'playstation', 'xbox', 'nitro', 'discord',
-  'баланс', 'подарочная', 'подарочную', 'карта', 'карты', 'валюта', 'валюту',
-  'донат', 'скин', 'скины', 'буст', 'робуксы', 'робукс', 'голда', 'голд',
+  'game', 'games', 'key', 'keys', 'subscription', 'account',
+  'steam', 'ps', 'playstation', 'xbox', 'nitro', 'discord',
+  'balance', 'gift', 'card', 'currency', 'donate', 'skin',
 ];
 
 function cleanQuery(raw) {
@@ -312,7 +314,7 @@ function scrollChat() {
 function initChat() {
   if (chatInitialized) return;
   chatInitialized = true;
-  addAIMessage('Привет! Я помогу найти выгодные предложения на цифровые товары. Напиши название — например, «Steam Balance». Если хочешь узнать, что я умею, напиши «помощь».');
+  addAIMessage('Привет! Я помогу найти выгодные предложения на цифровые товары. Важно: поиск работает только с английскими названиями — например, «Steam Balance» или «PlayStation Plus». Если хочешь узнать, что я умею, напиши «помощь».');
   setTimeout(() => { filters.style.display = 'grid'; }, 600);
 }
 
@@ -366,8 +368,7 @@ document.getElementById('clearBtn').addEventListener('click', () => {
 });
 
 function createStepsBubble() {
-  const bubble = addAIMessage('');
-  bubble.innerHTML = `
+  const bubble = addAIMessage(`
     <div class="typing">
       <span>Ищу</span>
       <span class="typing-dots"><span></span><span></span><span></span></span>
@@ -378,7 +379,7 @@ function createStepsBubble() {
       <div class="step-item" data-step="seller"><span class="step-icon">${spinnerSvg}</span><span>Продавцы</span></div>
       <div class="step-item" data-step="rating"><span class="step-icon">${spinnerSvg}</span><span>Рейтинги</span></div>
     </div>
-  `;
+  `);
   return bubble;
 }
 
@@ -410,6 +411,7 @@ function showHelpButtons() {
   const bubble = addAIMessage(html);
   bubble.querySelectorAll('.help-btn').forEach(btn => {
     btn.addEventListener('click', () => {
+      if (isBusy) return;
       addUserMessage(btn.dataset.question);
       askAI(btn.dataset.question);
     });
@@ -417,8 +419,7 @@ function showHelpButtons() {
 }
 
 async function askAI(question) {
-  const bubble = addAIMessage('');
-  bubble.innerHTML = '<div class="typing">Думаю<span class="typing-dots"><span></span><span></span><span></span></span></div>';
+  const bubble = addAIMessage('<div class="typing">Думаю<span class="typing-dots"><span></span><span></span><span></span></span></div>');
 
   try {
     const res = await fetch(`${AI_URL}?prompt=${encodeURIComponent(question)}`);
@@ -449,8 +450,12 @@ async function askAI(question) {
 }
 
 async function search() {
+  if (isBusy) return;
+
   const raw = document.getElementById('query').value.trim();
   if (!raw) return;
+
+  isBusy = true;
 
   if (isHelpRequest(raw) || !looksLikeProduct(raw)) {
     addUserMessage(raw);
@@ -459,8 +464,9 @@ async function search() {
     if (raw.toLowerCase().includes('помощь') || raw.toLowerCase().includes('help')) {
       showHelpButtons();
     } else {
-      askAI(raw);
+      await askAI(raw);
     }
+    isBusy = false;
     return;
   }
 
@@ -468,7 +474,8 @@ async function search() {
   if (query.length < 3) {
     addUserMessage(raw);
     document.getElementById('query').value = '';
-    askAI(raw);
+    await askAI(raw);
+    isBusy = false;
     return;
   }
 
@@ -506,6 +513,11 @@ async function search() {
       return;
     }
 
+    if (data.hint) {
+      addAIMessage(escapeHtml(data.hint));
+      return;
+    }
+
     currentProducts = data.products || [];
     if (currentProducts.length === 0) {
       addAIMessage(`По запросу «${escapeHtml(query)}» ничего не найдено. Попробуй другое название.`);
@@ -527,6 +539,7 @@ async function search() {
     addAIMessage('Ошибка сети: ' + escapeHtml(e.message));
   } finally {
     btn.disabled = false;
+    isBusy = false;
   }
 }
 
@@ -571,7 +584,12 @@ function renderProducts() {
 }
 
 document.getElementById('searchBtn').addEventListener('click', search);
-document.getElementById('query').addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
+document.getElementById('query').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    search();
+  }
+});
 
 const styleEl = document.createElement('style');
 styleEl.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
