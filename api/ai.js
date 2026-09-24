@@ -31,12 +31,12 @@ module.exports = async (req, res) => {
         'X-Title': 'Low Price',
       },
       body: JSON.stringify({
-        model: 'stealth/space-bunny-alpha',
+        model: 'deepseek/deepseek-v4-flash',
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: prompt },
         ],
-        max_tokens: 500,
+        max_tokens: 2000,
       }),
     });
 
