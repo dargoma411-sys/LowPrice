@@ -22,7 +22,6 @@ module.exports = async (req, res) => {
           queries: [query],
           maxResults: 100,
           maxPages: 3,
-          lang: 'ru',  // русский язык поиска
         }),
       }
     );
